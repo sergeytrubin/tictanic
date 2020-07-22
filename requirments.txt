@@ -1,0 +1,9 @@
+flask
+python-dotenv
+requests
+authlib>=0.14.1
+six
+requests
+gunicorn
+flask_cors
+python-jose

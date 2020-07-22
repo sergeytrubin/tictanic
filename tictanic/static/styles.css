@@ -1,0 +1,17 @@
+header {
+    width: 100%;
+    background-color: blue;
+}
+
+.header {
+    width: 100%;
+    background-color: orange;
+}
+
+.navbar-brand {
+    color: cyan !important;
+}
+
+.footer {
+    display: block;
+}

@@ -1,0 +1,1 @@
+from tictanic.blueprints.user.views import user
