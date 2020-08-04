@@ -1,16 +1,30 @@
-version: '2'
+version: "2"
 
 services:
-  website:
-    build: .
+  postgres:
+    env_file:
+      - ".env"
+    image: "postgres:10.3-alpine"
+    ports:
+      - "5432:5432"
+    volumes:
+      - "postgres:/var/lib/postgresql/data"
+
+  web:
+    build: "."
     command: >
-      gunicorn -b 0.0.0.0:5000
+      gunicorn -b 0.0.0.0:8000
         --access-logfile -
         --reload
-        "tictanic.app:create_app()"
-    environment:
-      PYTHONBUFFERED: 'true'
-    volumes:
-      - '.:/tictanic'
+        "app:create_app()"
+    depends_on:
+      - "postgres"
+    env_file:
+      - ".env"
     ports:
-      - '5000:5000'
+      - "8000:8000"
+    volumes:
+      - ".:/app"
+
+volumes:
+  postgres: {}

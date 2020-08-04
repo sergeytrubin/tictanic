@@ -1,0 +1,10 @@
+<h1>Login</h1>
+
+{% from 'macros.html' import render_field %}
+<form action="" method=post>
+    <dl>
+        {{ render_field(form.username) }}
+        {{ render_field(form.password) }}
+    </dl>
+    <p><input type=submit value=Submit>
+</form>

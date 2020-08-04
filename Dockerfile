@@ -1,18 +1,20 @@
-FROM python:3.8
+FROM python:3.6-slim
 
-ENV INSTALL_PATH /tictanic
-RUN mkdir -p $INSTALL_PATH
+RUN apt-get update && apt-get install -qq -y \
+  build-essential libpq-dev --no-install-recommends
 
-WORKDIR $INSTALL_PATH
+RUN mkdir /app
+WORKDIR /app
 
 RUN pip install --upgrade pip
 
-COPY ./Pipfile $WORKDIR/Pipfile
-COPY ./Pipfile.lock $WORKDIR/Pipfile.lock
-
-RUN pip install pipenv
-RUN cd $WORKDIR && pipenv install --system --deploy
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
+RUN pip install --editable .
 
-CMD gunicorn -d 0.0.0.0:5000 --access-logfile -  "tictanic.app:create_app()"
+LABEL maintainer="Sergey Trubin <sergey.trubin@protonmail.com>"
+
+#CMD gunicorn -b 0.0.0.0:8000 --access-logfile - "tictanic.app:create_app()"
+CMD gunicorn -b 0.0.0.0:8000 --access-logfile - "app:create_app()"
