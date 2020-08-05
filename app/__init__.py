@@ -9,7 +9,15 @@ from app.auth import auth as auth_blueprint
 
 def create_app(config=BaseConfig):
     app = Flask(__name__)
-    app.config.from_object(config)
+
+
+    if app.config['ENV'] == 'production':
+        app.config.from_object('config.BaseConfig')
+    if app.config['ENV'] == 'development':
+        app.config.from_object('config.TestConfig')
+    if app.config['ENV'] == 'testing':
+        app.config.from_object('config.AuthTestConfig')
+
 
     register_extensions(app)
     register_blueprints(app)

@@ -4,7 +4,7 @@ import os
 from sqlalchemy_utils import database_exists, create_database
 
 from app import create_app
-from app.database import db, populate_db
+from app.database import db
 from app.auth.models import User
 
 # Create an app context for the database connection.
@@ -32,7 +32,7 @@ def init(with_testdb):
     db.create_all()
 
     if with_testdb:
-        db_uri = '{0}_test'.format(app.config['SQLALCHEMY_DATABASE_URI'])
+        db_uri = f"{app.config['SQLALCHEMY_DATABASE_URI']}_test"
 
         if not database_exists(db_uri):
             create_database(db_uri)
