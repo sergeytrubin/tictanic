@@ -21,3 +21,6 @@ flask_login
 wtforms_alchemy
 flask_wtf
 python-dotenv
+authlib
+six
+requests

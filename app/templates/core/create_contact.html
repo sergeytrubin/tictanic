@@ -1,5 +1,11 @@
+{% extends "layout/base.html" %}
 {% from 'macros.html' import render_field %}
-<h1>Create New Contact</h1>
+{% block title %}Update Contact{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<h1>Update Contact</h1>
 <form method=post action="">
   <dl>
     {{ render_field(form.first_name) }}
@@ -9,5 +15,6 @@
     {{ render_field(form.mobile) }}
     {{ render_field(form.org_id) }}
   </dl>
-  <p><input type=submit value=Create>
+  <p><input type=submit value=Update>
 </form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "layout/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<div class="logged-in-box auth0-box logged-in">
+    <img class="avatar" src="{{userinfo['picture']}}" />
+    <h2>Welcome {{userinfo['name']}}</h2>
+    <pre>{{userinfo_pretty}}</pre>
+    <a class="btn btn-primary btn-lg btn-block" href="{{ url_for('core.create_ticket') }}">Create Ticket</button>
+    <a class="btn btn-primary btn-lg btn-block" href="{{ url_for('core.create_organisation') }}">Update Details</button>
+    <a class="btn btn-primary btn-lg btn-logout btn-block" href="/logout">Logout</a>
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@ from sqlalchemy_utils import database_exists, create_database
 
 from app import create_app
 from app.database import db
-from app.auth.models import User
+from app.blueprints.user.models import User
 
 # Create an app context for the database connection.
 app = create_app()
@@ -52,7 +52,7 @@ def seed():
 
     params = {
         'username': os.environ['SEED_USER_EMAIL'],
-        '_password': os.environ['SEED_USER_PASSWORD'],
+        'password': os.environ['SEED_USER_PASSWORD'],
         'first_name': os.environ['SEED_USER_FIRSTNAME'],
         'last_name': os.environ['SEED_USER_LASTNAME']
     }

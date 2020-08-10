@@ -1,0 +1,18 @@
+{% extends "layout/base.html" %}
+{% from 'macros.html' import render_field %}
+{% block title %}Ticket{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<h1>Create Ticket</h1>
+<form method=post action="">
+    <dl>
+        {{ render_field(form.subject) }}
+        {{ render_field(form.description) }}
+        {{ render_field(form.severity) }}
+        {{ render_field(form.status) }}
+    </dl>
+    <p><input type=submit value=Create>
+</form>
+{% endblock %}

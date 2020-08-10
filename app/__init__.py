@@ -3,8 +3,8 @@ from flask import Flask
 from config import BaseConfig
 from app.extensions import bcrypt, login_manager
 from app.database import db
-from app.core import core as core_blueprint
-from app.auth import auth as auth_blueprint
+from app.blueprints.core import core as core_blueprint
+from app.blueprints.user import user as user_blueprint
 
 
 def create_app(config=BaseConfig):
@@ -32,5 +32,5 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    app.register_blueprint(auth_blueprint)
+    app.register_blueprint(user_blueprint)
     app.register_blueprint(core_blueprint)

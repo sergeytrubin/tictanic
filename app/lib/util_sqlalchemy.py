@@ -1,5 +1,6 @@
 import datetime
 from sqlalchemy import DateTime
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.types import TypeDecorator
 from app.lib.util_datetime import tzware_datetime
 from app.database import db
@@ -24,12 +25,6 @@ class AwareDateTime(TypeDecorator):
 
 
 class ResourceMixin(object):
-    # Keep track when records are created and updated.
-    created_on = db.Column(AwareDateTime(),
-                           default=tzware_datetime)
-    updated_on = db.Column(AwareDateTime(),
-                           default=tzware_datetime,
-                           onupdate=tzware_datetime)
 
     def save(self):
         """
