@@ -1,9 +1,25 @@
-{% from 'macros.html' import render_field %}
-<h1>Create New Organisation</h1>
-<form method=post action="">
-  <dl>
-    {{ render_field(form.name) }}
-    {{ render_field(form.address) }}
-  </dl>
-  <p><input type=submit value=Create>
-</form>
+{% extends 'layout/base.html' %}
+{% import 'macros/form.html' as f with context %}
+
+{% block title %}Create Organisation{% endblock %}
+
+{% block body %}
+<div class="row">
+  <div class="col-md-8 col-md-offset-2 well">
+    {% call f.form_tag('core.create_organisation') %}
+    <legend>Create Organisation</legend>
+
+    {% call f.form_group(form.name, css_class='margin-bottom',
+                             placeholder='Please add Organisation Name') %}
+    {% endcall %}
+
+    {% call f.form_group(form.address, css_class='margin-bottom',
+                             placeholder='Add your organisation address',
+                             rows='12') %}
+    {% endcall %}
+
+    <button type="submit" class="btn btn-primary">Next</button>
+    {% endcall %}
+  </div>
+</div>
+{% endblock %}

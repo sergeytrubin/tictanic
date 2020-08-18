@@ -19,8 +19,10 @@ faker==0.8.7
 flask_bcrypt
 flask_login
 wtforms_alchemy
+wtforms_components
 flask_wtf
 python-dotenv
 authlib
 six
 requests
+

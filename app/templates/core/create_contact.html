@@ -1,20 +1,36 @@
-{% extends "layout/base.html" %}
-{% from 'macros.html' import render_field %}
-{% block title %}Update Contact{% endblock %}
-{% block head %}
-{{ super() }}
-{% endblock %}
-{% block content %}
-<h1>Update Contact</h1>
-<form method=post action="">
-  <dl>
-    {{ render_field(form.first_name) }}
-    {{ render_field(form.last_name) }}
-    {{ render_field(form.email) }}
-    {{ render_field(form.role) }}
-    {{ render_field(form.mobile) }}
-    {{ render_field(form.org_id) }}
-  </dl>
-  <p><input type=submit value=Update>
-</form>
+{% extends 'layout/base.html' %}
+{% import 'macros/form.html' as f with context %}
+
+{% block title %}Create Profile{% endblock %}
+
+{% block body %}
+<div class="row">
+  <div class="col-md-8 col-md-offset-2 well">
+    {% call f.form_tag('core.create_contact') %}
+    <legend>Update your profile</legend>
+
+    {% call f.form_group(form.first_name, css_class='margin-bottom',
+                             placeholder='Your first name') %}
+    {% endcall %}
+
+    {% call f.form_group(form.last_name, css_class='margin-bottom',
+                             placeholder='Your last name') %}
+    {% endcall %}
+
+    {% call f.form_group(form.email, css_class='margin-bottom',
+                                placeholder='E-mail address') %}
+    {% endcall %}
+
+    {% call f.form_group(form.mobile, css_class='margin-bottom',
+                             placeholder='Add your phone number',
+                             rows='12') %}
+    {% endcall %}
+
+    {% call f.form_group(form.role, css_class='margin-bottom') %}
+    {% endcall %}
+
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+    {% endcall %}
+  </div>
+</div>
 {% endblock %}

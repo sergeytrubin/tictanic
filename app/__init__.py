@@ -5,7 +5,7 @@ from app.extensions import bcrypt, login_manager
 from app.database import db
 from app.blueprints.core import core as core_blueprint
 from app.blueprints.user import user as user_blueprint
-
+from app.extensions import debug_toolbar
 
 def create_app(config=BaseConfig):
     app = Flask(__name__)
@@ -29,8 +29,13 @@ def register_extensions(app):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     db.init_app(app)
+    # debug_toolbar.init_app(app)
+
+    return None
 
 
 def register_blueprints(app):
     app.register_blueprint(user_blueprint)
     app.register_blueprint(core_blueprint)
+
+    return None

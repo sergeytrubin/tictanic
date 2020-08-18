@@ -1,18 +1,33 @@
-{% extends "layout/base.html" %}
-{% from 'macros.html' import render_field %}
-{% block title %}Ticket{% endblock %}
-{% block head %}
-{{ super() }}
-{% endblock %}
-{% block content %}
-<h1>Create Ticket</h1>
-<form method=post action="">
-    <dl>
-        {{ render_field(form.subject) }}
-        {{ render_field(form.description) }}
-        {{ render_field(form.severity) }}
-        {{ render_field(form.status) }}
-    </dl>
-    <p><input type=submit value=Create>
-</form>
+{% extends 'layout/base.html' %}
+{% import 'macros/form.html' as f with context %}
+
+{% block title %}Create a new ticket{% endblock %}
+<!-- {% block meta_description %}Contact our customer service department with any
+questions or concerns.{% endblock %} -->
+
+{% block body %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-2 well">
+        {% call f.form_tag('core.create_ticket') %}
+        <legend>We're here to answer your questions</legend>
+
+        {% call f.form_group(form.subject, css_class='margin-bottom',
+                             placeholder='Please add a subject') %}
+        {% endcall %}
+
+        {% call f.form_group(form.description, css_class='margin-bottom',
+                             placeholder='The more we know, the easier it will be to help you',
+                             rows='12') %}
+        {% endcall %}
+
+        {% call f.form_group(form.severity, css_class='margin-bottom') %}
+        {% endcall %}
+
+        {% call f.form_group(form.status, css_class='margin-bottom') %}
+        {% endcall %}
+
+        <button type="submit" class="btn btn-primary">Create Ticket</button>
+        {% endcall %}
+    </div>
+</div>
 {% endblock %}

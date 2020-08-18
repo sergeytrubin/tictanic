@@ -20,12 +20,19 @@ class User(Base):
         return User.query.filter(
             (User.email == identity) | (User.username == identity)).first()
 
+    @classmethod
+    def get_id(cls, session):
+        user = User.query.filter_by(
+            name=session['profile']['name']).first()
+        return user.id
+
     @staticmethod
     def create(**kwargs):
         u = User(**kwargs)
         db.session.add(u)
         try:
             db.session.commit()
-        except IntegrityError:
+        except Exception as err:
             db.session.rollback()
+            print(err)
         return u

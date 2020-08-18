@@ -1,3 +1,4 @@
+from sqlalchemy import or_
 from sqlalchemy_utils import EmailType, ChoiceType
 from app.database import db
 from app.lib.util_sqlalchemy import ResourceMixin, AwareDateTime
@@ -24,7 +25,7 @@ class Contact(Base):
     first_name = db.Column(db.String(60), nullable=False, info={"label": "First Name"})
     last_name = db.Column(db.String(60), nullable=False, info={"label": "Last Name"})
     email = db.Column(EmailType, nullable=False, info={"label": "Email"})
-    mobile = db.Column(db.Integer, info={"label": "Mobile"})
+    mobile = db.Column(db.String(60), info={"label": "Mobile"})
     role = db.Column(db.String(60), info={"label": "Role"})
     org_id = db.Column(db.Integer, db.ForeignKey('organisation.id', ondelete='cascade'), info={"label": "Organisation"})
     created_by = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='cascade'))
@@ -37,8 +38,10 @@ class Contact(Base):
         db.session.add(c)
         try:
             db.session.commit()
-        except IntegrityError:
+        except Exception as err:
             db.session.rollback()
+            print('ERROR ERROR ERROR')
+            print(err)
         return c
 
 
@@ -58,34 +61,67 @@ class Organisation(Base):
         db.session.add(o)
         try:
             db.session.commit()
-        except IntegrityError:
+        except Exception as err:
             db.session.rollback()
+            print('ERROR ERROR ERROR')
+            print(err)
         return o
 
 
 class Ticket(Base):
-    STATUS_CHOICE = [
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed')
-    ]
 
-    SEV_CHOICE = [
-        ('critical', 'Critical'),
-        ('high', 'High'),
-        ('medium', 'Medium'),
-        ('low', 'Low')
-    ]
-    subject = subject = db.Column(db.String(250), nullable=False)
-    description = db.Column(db.Text(), nullable=False)
-    severity = db.Column(ChoiceType(SEV_CHOICE), nullable=False)
-    status = db.Column(ChoiceType(STATUS_CHOICE), nullable=False)
-    close_date = db.Column(AwareDateTime(),
-                       onupdate=tzware_datetime)
-    created_by=db.Column(db.Integer, db.ForeignKey('user.id', ondelete='cascade'))
-    org_id=db.Column(db.Integer, db.ForeignKey('organisation.id', ondelete='cascade'))
-    contact_id=db.Column(db.Integer, db.ForeignKey('contact.id', ondelete='cascade'))
+    subject = db.Column(
+        db.String(250), nullable=False,info={"label": "Subject"})
+    description = db.Column(
+        db.Text(), nullable=False, info={"label": "Description"})
+    severity = db.Column(
+        db.String(250), nullable=False,info={"label": "Severity"})
+    status = db.Column(
+        db.String(250), nullable=False, info={"label": "Status"})
+    close_date = db.Column(
+        AwareDateTime(),onupdate=tzware_datetime)
+    created_by=db.Column(
+        db.Integer,db.ForeignKey('user.id', ondelete='cascade'))
+    org_id=db.Column(
+        db.Integer, db.ForeignKey('organisation.id', ondelete='cascade'))
+    org_name = db.Column(db.String(250), nullable=False)
+    org_address = db.Column(db.Text(), nullable=False)
+    contact_id=db.Column(
+        db.Integer, db.ForeignKey('contact.id', ondelete='cascade'))
+    contact_name = db.Column(
+        db.String(250), nullable=False, info={"label": "Full Name"})
+    contact_email = db.Column(
+        EmailType, nullable=False, info={"label": "Email"})
+    contact_phone = db.Column(
+        db.String(250), nullable=False, info={"label": "Phone"})
 
     activities = db.relationship('Activity', backref='ticket')
+
+    def short(self):
+        return {
+            'id': self.id,
+            'date_created': self.date_created,
+            'date_modified': self.date_modified,
+            'subject': self.subject,
+            'severity': self.severity,
+            'status': self.status,
+            'closed_date': self.close_date
+        }
+
+    def long(self):
+        return {
+            'id': self.id,
+            'date_created': self.date_created,
+            'date_modified': self.date_modified,
+            'subject': self.subject,
+            'description': self.description,
+            'severity': self.severity,
+            'status': self.status,
+            'closed_date': self.close_date,
+            'created_by': self.created_by,
+            'org_id': self.org_id,
+            'contact_id': self.contact_id
+        }
 
     @staticmethod
     def create(**kwargs):
@@ -93,9 +129,32 @@ class Ticket(Base):
         db.session.add(t)
         try:
             db.session.commit()
-        except IntegrityError:
+        except Exception as err:
             db.session.rollback()
+            print('ERROR ERROR ERROR')
+            print(err)
         return t
+
+    @classmethod
+    def search(cls, query):
+        """
+        Search a resource by 1 or more fields.
+
+        :param query: Search query
+        :type query: str
+        :return: SQLAlchemy filter
+        """
+        if not query:
+            return ''
+
+        search_query = f'%{query}%'
+        search_chain = (Ticket.subject.ilike(search_query),
+                        Ticket.description.ilike(search_query),
+                        Ticket.status.ilike(search_query),
+                        Ticket.severity.ilike(search_query))
+
+        return or_(*search_chain)
+
 
 
 class Invoice(Base):

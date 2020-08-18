@@ -3,7 +3,8 @@ from flask import (
     render_template,
     url_for,
     redirect,
-    session
+    session,
+    flash
 )
 from flask_login import login_required
 
@@ -31,12 +32,23 @@ def index():
 @core.route('/contact/create', methods=['GET', 'POST'])
 @login_required
 def create_contact():
-    form = CreateContact(request.form)
-    if request.method == 'POST':
-        if form.validate():
-            form.org_id.data = form.org_id.data.id
-            contact = Contact.create(**form.data)
-            return render_template('layout/dashboard.html')
+    form = CreateContact()
+    if request.method == 'POST' and form.validate():
+        org = Organisation.query.filter_by(
+            created_by=User.get_id(session)).first()
+        try:
+            Contact.create(
+                first_name=request.form['first_name'],
+                last_name=request.form['last_name'],
+                email=request.form['email'],
+                mobile=request.form['mobile'],
+                role=request.form['role'],
+                org_id=org.id,
+                created_by=User.get_id(session)
+            )
+        except Exception as err:
+            print(err)
+        return redirect(url_for('core.create_ticket'))
     return render_template('core/create_contact.html', form=form)
 
 
@@ -45,22 +57,25 @@ def create_contact():
 def view_contact(con_id):
     contact = Contact.query.filter_by(id=con_id).first_or_404()
     columns = [el.name for el in Contact.__table__.columns]
-    return render_template('core/view_contact.html', columns=columns, record=contact)
+    return render_template(
+        'core/view_contact.html',
+        columns=columns,
+        record=contact
+    )
 
 
 @core.route('/organisation/create', methods=['GET', 'POST'])
 @login_required
 def create_organisation():
-    form = CreateOrganisation(request.form)
-    user = User.query.filter_by(name=session['profile']['name']).first_or_404()
-    if request.method == 'POST':
-        if form.validate():
-            org = Organisation.create(
-                name=form.name.data,
-                address=form.address.data,
-                created_by=user.id
-            )
-            return redirect(url_for('core.create_contact'))
+    form = CreateOrganisation()
+    if request.method == 'POST' and form.validate():
+        Organisation.create(
+            name=request.form['name'],
+            address=request.form['address'],
+            created_by=User.get_id(session)
+        )
+        flash('organisation created', 'success')
+        return redirect(url_for('core.create_contact'))
     return render_template('core/create_organisation.html', form=form)
 
 
@@ -74,11 +89,11 @@ def view_organisation(org_id):
 @core.route('/ticket/create', methods=['GET', 'POST'])
 @login_required
 def create_ticket():
-    form = CreateTicket(request.form)
-    user = User.query.filter_by(name=session['profile']['name']).first_or_404()
+    form = CreateTicket()
+    user_id = User.get_id(session)
 
     try:
-        org = Organisation.query.filter_by(created_by=user.id).first_or_404()
+        org = Organisation.query.filter_by(created_by=user_id).first_or_404()
     except NotFound:
         return redirect(url_for('core.create_organisation'))
 
@@ -87,16 +102,30 @@ def create_ticket():
     except NotFound:
         return redirect(url_for('core.create_contact'))
 
-    if request.method == 'POST':
-        if form.validate():
-            ticket = Ticket.create(
-                subject=form.subject.data,
-                description=form.description.data,
-                severity=form.severity.data,
-                status=form.status.data,
-                created_by=user.id,
+    if request.method == 'POST' and form.validate():
+            Ticket.create(
+                subject=request.form['subject'],
+                description=request.form['description'],
+                severity=request.form['severity'],
+                status=request.form['status'],
+                created_by=user_id,
                 org_id=org.id,
-                contact_id=contact.id
+                org_name=org.name,
+                org_address=org.address,
+                contact_id=contact.id,
+                contact_name=f"{contact.first_name} {contact.last_name}",
+                contact_email=contact.email,
+                contact_phone=contact.mobile
             )
-            return redirect(url_for('core.view_organisation', org_id=org.id))
+            flash('Thank you! The ticket was created', 'success')
+            return redirect(url_for('core.view_tickets'))
     return render_template('core/create_ticket.html', form=form)
+
+
+@core.route('/tickets')
+def view_tickets():
+    user_id = User.get_id(session)
+
+    tickets = Ticket.query.filter_by(created_by=user_id).all()
+    print(tickets)
+    return render_template('core/view_tickets.html', tickets=tickets)
